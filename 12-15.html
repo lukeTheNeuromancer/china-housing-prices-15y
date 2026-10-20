@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>中国12城15年房价走势深度分析</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Noto+Serif+SC:wght@600;700;900&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f6f3ee;
+        --surface: #fffdf9;
+        --surface2: #efe9df;
+        --ink: #211c15;
+        --muted: #6d6355;
+        --faint: #9a8f7d;
+        --line: #ddd3c2;
+        --accent: #b3352b;
+        --accent-ink: #8f271e;
+        --down: #22705a;
+        --gold: #a97b1e;
+        --chip: #efe9df;
+        --shadow: 0 1px 3px rgba(60, 45, 20, .08);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #17140f;
+          --surface: #211d16;
+          --surface2: #2a251c;
+          --ink: #ece5d8;
+          --muted: #b3a892;
+          --faint: #857a66;
+          --line: #3d362a;
+          --accent: #e0654f;
+          --accent-ink: #eda08f;
+          --down: #4cb294;
+          --gold: #d3a94e;
+          --chip: #2a251c;
+          --shadow: 0 1px 3px rgba(0, 0, 0, .4);
+        }
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+        font-size: 16px;
+        line-height: 1.75;
+      }
+      .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px 72px; }
+      h1, h2, h3 { font-family: "Noto Serif SC", "Songti SC", serif; line-height: 1.35; }
+      a { color: var(--accent-ink); }
+
+      /* ---------- header ---------- */
+      header.hero { padding: 44px 0 8px; }
+      .hero .scope {
+        font-size: 13px; letter-spacing: .14em; color: var(--accent);
+        font-weight: 700; margin: 0 0 10px;
+      }
+      .hero h1 { font-size: clamp(30px, 5.4vw, 46px); font-weight: 900; margin: 0 0 14px; }
+      .hero .lede { font-size: 17px; color: var(--muted); max-width: 46em; margin: 0 0 6px; }
+      .hero .meta { font-size: 13px; color: var(--faint); margin: 10px 0 0; }
+      .hero .meta b { color: var(--muted); font-weight: 500; }
+
+      .honest {
+        margin: 22px 0 0; padding: 14px 18px;
+        background: var(--surface2); border: 1px solid var(--line);
+        border-radius: 10px; font-size: 14px; color: var(--muted);
+      }
+      .honest b { color: var(--ink); }
+
+      /* ---------- KPI strip ---------- */
+      .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 26px 0 6px; }
+      .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow); }
+      .kpi .num { font-family: "Noto Serif SC", serif; font-size: 30px; font-weight: 900; line-height: 1.15; }
+      .kpi .num.red { color: var(--accent); }
+      .kpi .num.green { color: var(--down); }
+      .kpi .lbl { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+      @media (max-width: 760px) { .kpis { grid-template-columns: 1fr 1fr; } }
+
+      /* ---------- sections ---------- */
+      section { margin-top: 52px; }
+      .sec-head { border-bottom: 2px solid var(--ink); padding-bottom: 8px; margin-bottom: 18px; display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+      .sec-head h2 { font-size: 26px; font-weight: 900; margin: 0; }
+      .sec-head .no { font-family: "Noto Serif SC", serif; color: var(--accent); font-size: 20px; font-weight: 700; }
+      .sec-head p { margin: 0; color: var(--muted); font-size: 14px; flex: 1 1 260px; }
+      .src { font-size: 12.5px; color: var(--faint); margin-top: 10px; line-height: 1.6; }
+      .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; box-shadow: var(--shadow); }
+      .note { font-size: 14px; color: var(--muted); }
+      .note b { color: var(--ink); }
+
+      /* ---------- charts ---------- */
+      .chart-box { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 18px 10px; box-shadow: var(--shadow); }
+      .chart-box svg { width: 100%; height: auto; display: block; }
+      .bar-row { display: grid; grid-template-columns: 52px 1fr 118px; align-items: center; gap: 10px; padding: 5px 0; }
+      .bar-row .city { font-weight: 700; font-size: 15px; text-align: right; }
+      .bar-row .track { background: var(--surface2); border-radius: 5px; height: 22px; position: relative; }
+      .bar-row .fill { height: 100%; border-radius: 5px; background: var(--accent); opacity: .88; }
+      .bar-row.t2 .fill { background: var(--gold); }
+      .bar-row .val { font-size: 14px; font-variant-numeric: tabular-nums; }
+      .bar-row .val small { color: var(--faint); font-size: 12px; display: block; line-height: 1.3; }
+      @media (max-width: 560px) { .bar-row { grid-template-columns: 40px 1fr 96px; } .bar-row .val { font-size: 13px; } }
+
+      .toggles { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+      .toggles button {
+        font: inherit; font-size: 13.5px; padding: 5px 14px; border-radius: 999px;
+        border: 1px solid var(--line); background: var(--chip); color: var(--muted);
+        cursor: pointer;
+      }
+      .toggles button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); font-weight: 700; }
+      .toggles button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+      .legend-note { font-size: 12.5px; color: var(--faint); margin: 6px 2px 10px; }
+
+      /* pullback bars */
+      .pb-row { display: grid; grid-template-columns: 52px 1fr 150px; align-items: center; gap: 10px; padding: 6px 0; }
+      .pb-row .city { font-weight: 700; text-align: right; }
+      .pb-row .track { background: var(--surface2); border-radius: 5px; height: 24px; }
+      .pb-row .fill { height: 100%; border-radius: 5px; background: var(--down); }
+      .pb-row .val { font-size: 14px; font-variant-numeric: tabular-nums; }
+      .pb-row .val small { color: var(--faint); display: block; font-size: 12px; line-height: 1.35; }
+      @media (max-width: 560px) { .pb-row { grid-template-columns: 40px 1fr 118px; } }
+
+      /* ---------- city nav + cards ---------- */
+      .citynav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+      .citynav a {
+        font-size: 13.5px; padding: 5px 13px; border-radius: 999px; text-decoration: none;
+        background: var(--chip); color: var(--muted); border: 1px solid var(--line);
+      }
+      .citynav a:hover { color: var(--ink); }
+      .cities { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      @media (max-width: 820px) { .cities { grid-template-columns: 1fr; } }
+      .city-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; box-shadow: var(--shadow); scroll-margin-top: 16px; }
+      .city-card h3 { margin: 0; font-size: 22px; font-weight: 900; display: flex; align-items: baseline; gap: 10px; }
+      .city-card h3 .tier { font-family: "Noto Sans SC", sans-serif; font-size: 12px; font-weight: 500; color: var(--accent); border: 1px solid var(--accent); border-radius: 999px; padding: 1px 9px; }
+      .city-card h3 .rank { font-family: "Noto Sans SC", sans-serif; font-size: 12.5px; color: var(--faint); font-weight: 400; margin-left: auto; }
+      .price-line { display: flex; align-items: baseline; gap: 10px; margin: 10px 0 2px; flex-wrap: wrap; }
+      .price-line .big { font-family: "Noto Serif SC", serif; font-size: 32px; font-weight: 900; font-variant-numeric: tabular-nums; }
+      .price-line .unit { color: var(--muted); font-size: 13.5px; }
+      .price-line .total { margin-left: auto; font-size: 13.5px; color: var(--muted); }
+      .price-line .total b { color: var(--ink); font-variant-numeric: tabular-nums; }
+      table.facts { width: 100%; border-collapse: collapse; margin: 12px 0 4px; font-size: 13.5px; }
+      table.facts th, table.facts td { text-align: left; padding: 6px 8px 6px 0; border-top: 1px solid var(--line); vertical-align: top; }
+      table.facts th { color: var(--muted); font-weight: 500; width: 34%; }
+      table.facts td { font-variant-numeric: tabular-nums; }
+      table.facts td .cal { color: var(--faint); font-size: 12px; display: block; line-height: 1.45; }
+      .down-txt { color: var(--down); font-weight: 700; }
+      .up-txt { color: var(--accent); font-weight: 700; }
+      .city-card .comment { font-size: 14.5px; color: var(--ink); margin: 12px 0 0; }
+      .city-card .district { font-size: 13px; color: var(--muted); margin: 10px 0 0; padding-top: 10px; border-top: 1px dashed var(--line); }
+      .city-card .district b { color: var(--ink); font-weight: 500; }
+      .missing { color: var(--faint); }
+
+      /* ---------- gaps & sources ---------- */
+      .gaps { columns: 2; column-gap: 34px; font-size: 14.5px; }
+      @media (max-width: 760px) { .gaps { columns: 1; } }
+      .gaps li { margin-bottom: 10px; break-inside: avoid; }
+      .gaps b { color: var(--accent-ink); }
+      ol.sources { font-size: 13.5px; color: var(--muted); padding-left: 22px; }
+      ol.sources li { margin-bottom: 7px; word-break: break-all; }
+      footer { margin-top: 56px; border-top: 1px solid var(--line); padding-top: 16px; font-size: 13px; color: var(--faint); }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <p class="scope">深度调研报告 · 2011 — 2026</p>
+        <h1>中国12城15年房价走势</h1>
+        <p class="lede">一线四城（北京、上海、广州、深圳）与八座新一线／强二线（杭州、南京、成都、武汉、苏州、西安、重庆、长沙），15 年里经历了同一轮大周期：2011 年后的长涨、2021–2022 年见顶、此后分化回调。这份报告把能查到的每一项价格、指数与口径都摆出来——查不到的，明确写"未查到"。</p>
+        <p class="meta">调研时间：<b>2026 年 10 月 19–20 日</b>（索引口径）&nbsp;·&nbsp; 价格锚点：<b>2026 年 9 月</b>&nbsp;·&nbsp; 二手房优先，新房为辅</p>
+        <div class="honest">
+          <b>先说清数据边界：</b>12 城 2026 年 9 月二手均价、国家统计局 70 城定基指数（2020 年＝100）的多期快照、一线四城的回调幅度，都有公开来源可查。但<b>逐年元/㎡价格序列（2013、2015、2017、2019 年）和绝大多数区级峰值／现价，本次调研未查到可引用的公开来源</b>，报告中一律标注"未查到"，不做估算填充。区级维度仅深圳有 2023 年各区过户成交价一项可用数据。
+        </div>
+      </header>
+
+      <div class="kpis">
+        <div class="kpi">
+          <div class="num">12,452<span style="font-size:16px"> 元/㎡</span></div>
+          <div class="lbl">2026 年 9 月百城二手住宅均价，同比 <b>-6.94%</b>（中指研究院）</div>
+        </div>
+        <div class="kpi">
+          <div class="num green">+0.2%</div>
+          <div class="lbl">2026 年 9 月一线城市二手价格环比，连续释放企稳信号（国家统计局）</div>
+        </div>
+        <div class="kpi">
+          <div class="num red">近 -40%</div>
+          <div class="lbl">深圳二手价较 2021 年高点回调幅度，一线中最深（机构／媒体综合口径）</div>
+        </div>
+        <div class="kpi">
+          <div class="num green">+0.8%</div>
+          <div class="lbl">上海 2026 年 9 月二手价格同比，为一线四城中唯一正增长（国家统计局）</div>
+        </div>
+      </div>
+
+      <section id="now">
+        <div class="sec-head">
+          <span class="no">01</span>
+          <h2>现在的价格：2026 年 9 月二手均价</h2>
+          <p>12 城二手住宅均价排行，深圳、上海、北京居前三，重庆垫底——最高与最低之间差 7.7 倍。</p>
+        </div>
+        <div class="chart-box" id="priceChart" role="img" aria-label="12城2026年9月二手住宅均价条形图：深圳69196元每平方米最高，重庆8973元每平方米最低"></div>
+        <p class="src">来源：中国房价行情 creprice.cn（禧泰数据）"全国城市房价排行（近 6 个月）"，用途住宅／交易二手房，2026-10-19 读取。口径为近 6 个月二手住宅均价，偏挂牌／在售口径；括号内为全国排名。右侧金额为按均价折算的 100㎡ 总价。</p>
+      </section>
+
+      <section id="peak">
+        <div class="sec-head">
+          <span class="no">02</span>
+          <h2>见顶时刻：二手价格指数（2020 年＝100）</h2>
+          <p>国家统计局 70 城二手住宅定基指数。深圳 2021 年 5 月最先见顶，京沪穗迟至 2022 年 8 月；苏州不在 70 城覆盖范围内，无指数。</p>
+        </div>
+        <div class="chart-box">
+          <div class="toggles" id="idxToggles" role="group" aria-label="选择城市"></div>
+          <div id="idxChart" role="img" aria-label="70城二手住宅定基指数折线图，2020年为100"></div>
+          <p class="legend-note">仅绘制有公开数据的月份（2021 年 5 月、2021 年 12 月、2022 年 4 月、2022 年 8 月），点与点之间为直线连接；圆点为各城指数峰值。2022 年 8 月之后统计局未公开定基全表，故曲线止于 2022 年——此后走势见第 03 节回调数据与各城 2026 年 9 月同比。</p>
+        </div>
+        <p class="src">来源：国家统计局 70 城住宅销售价格指数（二手住宅定基，2020 年＝100）；2022 年 4 月数值经聚汇数据整理，2021 年 5 月数值经中金在线转载统计局发布。</p>
+      </section>
+
+      <section id="pullback">
+        <div class="sec-head">
+          <span class="no">03</span>
+          <h2>回调榜：从高点跌了多少</h2>
+          <p>精确到城市的官方回调百分比并未公开发布；一线四城的幅度来自机构／媒体综合口径，只能当量级参考。</p>
+        </div>
+        <div class="card">
+          <div class="pb-row"><div class="city">深圳</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">接近 -40%<small>价格回落至 2016 年中水平</small></div></div>
+          <div class="pb-row"><div class="city">上海</div><div class="track"><div class="fill" style="width:80%"></div></div><div class="val">-30% 以上<small>跌幅略大于北京，回落至 2016 年初</small></div></div>
+          <div class="pb-row"><div class="city">北京</div><div class="track"><div class="fill" style="width:75%"></div></div><div class="val">约 -30%<small>回落至 2016 年中水平</small></div></div>
+          <div class="pb-row"><div class="city">广州</div><div class="track"><div class="fill" style="width:69%"></div></div><div class="val">约 -25%～-30%<small>回落至 2017 年初水平</small></div></div>
+          <p class="note" style="margin-top:14px">作为背景：贝壳研究院口径下，<b>重点 30 城二手房较峰值平均回落近四成</b>。杭州、南京、成都、武汉、苏州、西安、重庆、长沙 8 城<b>未查到</b>精确到城的公开回调百分比——它们 2020 年至峰值的指数涨幅本身就小得多（南京仅 +3.9%、重庆 +5.0%、长沙 +5.9%），与一线不是同一个量级。</p>
+        </div>
+        <p class="src">来源：2026 年 10 月 18 日媒体综述（综合贝壳研究院等机构口径），非官方精确统计，引用时应标注"机构／媒体综合口径"。</p>
+      </section>
+
+      <section id="cities">
+        <div class="sec-head">
+          <span class="no">04</span>
+          <h2>逐城档案</h2>
+          <p>每城只列查证到的数据点，并注明口径；"未查到"即本次调研没有找到可引用的公开来源。</p>
+        </div>
+        <nav class="citynav" aria-label="城市导航">
+          <a href="#bj">北京</a><a href="#sh">上海</a><a href="#gz">广州</a><a href="#sz">深圳</a><a href="#hz">杭州</a><a href="#nj">南京</a><a href="#cd">成都</a><a href="#wh">武汉</a><a href="#su">苏州</a><a href="#xa">西安</a><a href="#cq">重庆</a><a href="#cs">长沙</a>
+        </nav>
+        <div class="cities">
+
+          <article class="city-card" id="bj">
+            <h3>北京 <span class="tier">一线</span><span class="rank">2026 年 9 月二手价全国第 3</span></h3>
+            <div class="price-line"><span class="big">54,395</span><span class="unit">元/㎡ · 2026 年 9 月二手均价</span><span class="total">100㎡ 约 <b>544 万元</b></span></div>
+            <table class="facts">
+              <tr><th>2011 年锚点</th><td>二手约 22,018 元/㎡（2011 年 11 月）<span class="cal">北京市住建委发布；新房全年成交均价 13,173 元/㎡（北京市房地产协会）</span></td></tr>
+              <tr><th>15 年涨幅</th><td>二手约 <span class="up-txt">+147%</span>（22,018 → 54,395）<span class="cal">两端分属住建委发布价与禧泰二手均价，口径不同，仅供参考；这是 12 城中唯一可计算的长期涨幅</span></td></tr>
+              <tr><th>指数峰值</th><td>116.0（2022 年 8 月）<span class="cal">统计局 70 城二手定基（2020 年＝100）；2021 年 12 月为 111.6，2022 年 4 月为 115——12 城中见顶最晚的一批</span></td></tr>
+              <tr><th>高点回调</th><td><span class="down-txt">约 -30%</span>，回落至 2016 年中水平<span class="cal">机构／媒体综合口径</span></td></tr>
+              <tr><th>2026 年 9 月</th><td>二手环比 +0.1%、同比 -2.5%；新房成交均价 57,554 元/㎡<span class="cal">统计局（环比同比）；新房为 CRIC 重点 15 城网签口径</span></td></tr>
+              <tr><th>租金回报</th><td>约 1.8%（估算）<span class="cal">中指 2026 年 9 月北京住宅租金 80 元/㎡/月以上，按 80 元 ×12 ÷ 54,395 估算毛租金回报率</span></td></tr>
+            </table>
+            <p class="comment">北京是 12 城中二手指数峰值出现最晚的城市之一，2021–2022 年相对抗跌；但见顶之后同样回调约三成，核心区与远郊分化显著。2026 年 9 月同比 -2.5%，在一线中居中。</p>
+            <p class="district"><b>区级数据：</b>东城／西城、朝阳、海淀、丰台、通州、大兴的 2021 年峰值与 2026 年现价<span class="missing">均未查到</span>。学术论文《北京市房价时空分异研究》（曹文彦，2023）含 2015–2021 年各区房价均值，本次未提取到具体数值，可作后续深挖线索。</p>
+          </article>
+
+          <article class="city-card" id="sh">
+            <h3>上海 <span class="tier">一线</span><span class="rank">2026 年 9 月二手价全国第 2</span></h3>
+            <div class="price-line"><span class="big">61,616</span><span class="unit">元/㎡ · 2026 年 9 月二手均价</span><span class="total">100㎡ 约 <b>616 万元</b></span></div>
+            <table class="facts">
+              <tr><th>2021 年峰值</th><td>二手 63,978 元/㎡（2021 年末，同比 +17%）<span class="cal">《存量市场：2021 上海住宅交易市场》RVMS 挂牌修正估值口径——12 城中唯一有元/㎡峰值可考的城市</span></td></tr>
+              <tr><th>2021 → 2026</th><td>二手约 <span class="down-txt">-3.7%</span>（63,978 → 61,616）<span class="cal">两端分属 RVMS 估值口径与禧泰交易口径，不同机构，谨慎对比</span></td></tr>
+              <tr><th>指数峰值</th><td>113.6（2022 年 8 月）<span class="cal">统计局 70 城二手定基（2020 年＝100）</span></td></tr>
+              <tr><th>高点回调</th><td><span class="down-txt">-30% 以上</span>，回落至 2016 年初水平<span class="cal">机构／媒体综合口径，与上行 RVMS 对比口径不同，两者不可直接互证</span></td></tr>
+              <tr><th>新房</th><td>2026 年 9 月成交均价 73,968 元/㎡，居重点城市之首；2021 年 2 月累计平均 55,922 元/㎡为历史高位<span class="cal">CRIC 网签口径；CEIC／国家统计局商品房累计平均销售价格（2025 年 12 月为 46,267 元/㎡）</span></td></tr>
+              <tr><th>2026 年 9 月</th><td>二手环比 +0.5%（一线最强）、同比 <span class="up-txt">+0.8%</span>（一线唯一正增长）<span class="cal">国家统计局</span></td></tr>
+              <tr><th>租金回报</th><td>约 1.6%（估算）<span class="cal">中指 2026 年 9 月上海住宅租金居 50 城首位（80 元/㎡/月以上），按 80 元估算</span></td></tr>
+            </table>
+            <p class="comment">上海是本轮周期中二手价格最坚挺的一线城市。新房受优质改善项目入市带动，2026 年 9 月成交均价反居各重点城市之首，与二手走势明显分化。</p>
+            <p class="district"><b>区级数据：</b>黄浦／静安、徐汇、浦东、闵行、嘉定、松江的 2021 年峰值与 2026 年现价<span class="missing">均未查到</span>可对比的公开二手均价。</p>
+          </article>
+
+          <article class="city-card" id="gz">
+            <h3>广州 <span class="tier">一线</span><span class="rank">2026 年 9 月二手价全国第 4</span></h3>
+            <div class="price-line"><span class="big">37,664</span><span class="unit">元/㎡ · 2026 年 9 月二手均价</span><span class="total">100㎡ 约 <b>377 万元</b></span></div>
+            <table class="facts">
+              <tr><th>指数峰值</th><td>112.7（2022 年 8 月）<span class="cal">统计局 70 城二手定基（2020 年＝100）；2021 年 5 月已达 110.2，2022 年 4 月 111.9</span></td></tr>
+              <tr><th>高点回调</th><td><span class="down-txt">约 -25%～-30%</span>，回落至 2017 年初水平<span class="cal">机构／媒体综合口径</span></td></tr>
+              <tr><th>新房年均价</th><td>2023 年 29,040 元/㎡见顶（1999–2024 区间最高），2024 年回落至 26,864 元/㎡<span class="cal">CEIC／国家统计局商品房销售价格，年均口径</span></td></tr>
+              <tr><th>2026 年 9 月</th><td>二手环比 +0.1%、同比 -2.9%<span class="cal">同比跌幅为一线四城最大（国家统计局）</span></td></tr>
+              <tr><th>租金回报</th><td>约 1.5%（估算）<span class="cal">中指 2026 年 9 月广州住宅租金 45–50 元/㎡/月，按 47.5 元估算</span></td></tr>
+            </table>
+            <p class="comment">广州与京沪同步在 2022 年 8 月见顶，但调整持续得更久：新房年均价 2023 年才达峰、二手同比跌幅至今仍居一线之首。</p>
+            <p class="district"><b>区级数据：</b>越秀、天河、海珠、番禺、黄埔、白云的 2021 年峰值与 2026 年现价<span class="missing">均未查到</span>。</p>
+          </article>
+
+          <article class="city-card" id="sz">
+            <h3>深圳 <span class="tier">一线</span><span class="rank">2026 年 9 月二手价全国第 1</span></h3>
+            <div class="price-line"><span class="big">69,196</span><span class="unit">元/㎡ · 2026 年 9 月二手均价</span><span class="total">100㎡ 约 <b>692 万元</b></span></div>
+            <table class="facts">
+              <tr><th>现价口径分歧</th><td>禧泰 69,196 ／ 安居客挂牌 51,703 ／ 9 月上半月成交 60,100 元/㎡<span class="cal">三家口径差异极大，引用深圳现价必须注明来源；9 月上半月成交均价环比 +4%</span></td></tr>
+              <tr><th>指数峰值</th><td>109.4（2021 年 5 月）<span class="cal">统计局 70 城二手定基（2020 年＝100）；二手房参考价政策后 2021 年中即见顶，早于京沪穗约一年</span></td></tr>
+              <tr><th>高点回调</th><td><span class="down-txt">接近 -40%</span>，回落至 2016 年中水平<span class="cal">机构／媒体综合口径，一线中最深</span></td></tr>
+              <tr><th>高位个案</th><td>福田港城华庭 63㎡ 三房：2021 年高位成交 490–555 万元（约 7.8–8.8 万/㎡），2026 年 9 月同户型挂牌约 380 万元（约 6.03 万/㎡）<span class="cal">每日经济新闻引深圳贝壳研究院，2026 年 9 月</span></td></tr>
+              <tr><th>新房</th><td>2026 年 9 月成交均价 60,750 元/㎡（CRIC）；公示均价 55,490 元/㎡</td></tr>
+              <tr><th>2026 年 9 月</th><td>二手环比 +0.2%、同比 -1.5%<span class="cal">国家统计局</span></td></tr>
+              <tr><th>租金回报</th><td>约 1.4%（估算），12 城中最低之一<span class="cal">中指 2026 年 9 月深圳住宅租金 80 元/㎡/月以上，按 80 元估算</span></td></tr>
+            </table>
+            <p class="comment">深圳是本轮调整最深的一线城市，也是见顶最早的：2021 年 5 月指数即达峰。但 2026 年 9 月上半月成交均价环比 +4%，改善型与高端需求回升迹象初现。</p>
+            <p class="district"><b>区级数据（2023 年二手过户成交均价，深圳市房地产信息系统）：</b>南山约 9 万/㎡（同比 -12.6%）、福田约 8 万/㎡（同比 -11.1%）、宝安约 6.5 万/㎡（同比 -13.3%），2023 年各区同比跌幅在 11%–18% 之间。各区 2021 年峰值与 2026 年现价<span class="missing">未查到</span>，无法计算区级回调。</p>
+          </article>
+
+          <article class="city-card" id="hz">
+            <h3>杭州 <span class="tier">新一线</span><span class="rank">2026 年 9 月二手价全国第 5</span></h3>
+            <div class="price-line"><span class="big">33,222</span><span class="unit">元/㎡ · 2026 年 9 月二手均价</span><span class="total">100㎡ 约 <b>332 万元</b></span></div>
+            <table class="facts">
+              <tr><th>指数峰值</th><td>109.5（2022 年 4 月）<span class="cal">统计局 70 城二手定基（2020 年＝100）；2022 年 8 月为 109.2</span></td></tr>
+              <tr><th>高点回调</th><td><span class="missing">未查到</span>精确到城的公开回调百分比</td></tr>
+              <tr><th>租金回报</th><td>约 1.7%（估算）<span class="cal">中指 2026 年 9 月杭州住宅租金 45–50 元/㎡/月，按 47.5 元估算</span></td></tr>
+            </table>
+            <p class="comment">杭州二手均价居新一线之首。2024 年 3 月全面取消限购后市场企稳，2026 年 9 月有优质新建楼盘入市；二手指数 2022 年 4 月见顶后的回调量级，尚无精确公开数据。</p>
+            <p class="district"><b>区级数据：</b>上城／西湖、滨江、余杭、萧山、临安的峰值与现价<span class="missing">均未查到</span>。</p>
+          </article>
+
+          <article class="city-card" id="nj">
+            <h3>南京 <span class="tier">强二线</span><span class="rank">2026 年 9 月二手价全国第 8</span></h3>
+            <div class="price-line"><span class="big">23,661</span><span class="unit">元/㎡ · 2026 年 9 月二手均价</span><span class="total">100㎡ 约 <b>237 万元</b></span></div>
+            <table class="facts">
+              <tr><th>指数峰值</th><td>103.9（2022 年 4 月）<span class="cal">统计局 70 城二手定基（2020 年＝100）；2022 年 8 月回落至 103.4</span></td></tr>
+              <tr><th>高点回调</th><td><span class="missing">未查到</span>精确到城的公开回调百分比</td></tr>
+            </table>
+            <p class="comment">南京的指数峰值（103.9）明显低于其他强二线——2020–2021 年这一轮涨幅温和，峰值前只涨了 3.9%。2026 年 9 月二手均价在 8 座新一线／强二线中居第 2。</p>
+            <p class="district"><b>区级数据：</b>玄武／鼓楼、建邺、江宁、栖霞、浦口的峰值与现价<span class="missing">均未查到</span>。</p>
+          </article>
+
+          <article class="city-card" id="cd">
+            <h3>成都 <span class="tier">新一线</span><span class="rank">2026 年 9 月二手价全国第 20</span></h3>
+            <div class="price-line"><span class="big">14,156</span><span class="unit">元/㎡ · 2026 年 9 月二手均价</span><span class="total">100㎡ 约 <b>142 万元</b></span></div>
+            <table class="facts">
+              <tr><th>指数峰值</th><td>109.6（2022 年 4 月）<span class="cal">统计局 70 城二手定基（2020 年＝100），2020 年至峰值涨幅约 9.6%，在二线中偏高</span></td></tr>
+              <tr><th>高点回调</th><td><span class="missing">未查到</span>精确到城的公开回调百分比</td></tr>
+            </table>
+            <p class="comment">成都二手指数 2022 年 4 月见顶。中指研究院 2026 年 9 月点名成都为"优质新建楼盘入市"的重点城市之一，新房市场相对活跃，与二手走势分化。</p>
+            <p class="district"><b>区级数据：</b>锦江／青羊、武侯、高新南区、成华、双流、郫都的峰值与现价<span class="missing">均未查到</span>（学术论文有 2014–2018 年各区数据，年代较早，未采用）。</p>
+          </article>
+
+          <article class="city-card" id="wh">
+            <h3>武汉 <span class="tier">新一线</span><span class="rank">2026 年 9 月二手价全国第 31</span></h3>
+            <div class="price-line"><span class="big">12,037</span><span class="unit">元/㎡ · 2026 年 9 月二手均价</span><span class="total">100㎡ 约 <b>120 万元</b></span></div>
+            <table class="facts">
+              <tr><th>指数峰值</th><td><span class="missing">未查到</span>具体数值<span class="cal">2022 年 4 月定基已回落至 100.4、8 月降至 98.5，说明实际峰值在 2021 年内，但 2021 年各月定基未查到</span></td></tr>
+              <tr><th>高点回调</th><td><span class="missing">未查到</span>精确到城的公开回调百分比</td></tr>
+            </table>
+            <p class="comment">武汉是 12 城中见顶节奏最难校准的：2022 年 4 月指数已跌回 2020 年水平附近（100.4），意味着它的高点比多数城市来得更早、回落也更早。2026 年 9 月二手均价在 12 城中处于中下游。</p>
+            <p class="district"><b>区级数据：</b>江汉／江岸、武昌、洪山、东西湖、黄陂的峰值与现价<span class="missing">均未查到</span>。</p>
+          </article>
+
+          <article class="city-card" id="su">
+            <h3>苏州 <span class="tier">强二线</span><span class="rank">2026 年 9 月二手价全国第 14</span></h3>
+            <div class="price-line"><span class="big">17,030</span><span class="unit">元/㎡ · 2026 年 9 月二手均价</span><span class="total">100㎡ 约 <b>170 万元</b></span></div>
+            <table class="facts">
+              <tr><th>指数峰值</th><td><span class="missing">无指数</span><span class="cal">苏州不在国家统计局 70 城指数覆盖范围，涨跌节奏无法用官方指数校准——12 城中唯一</span></td></tr>
+              <tr><th>高点回调</th><td><span class="missing">未查到</span>可靠来源，历史峰值价格亦未查到</td></tr>
+            </table>
+            <p class="comment">苏州 2026 年 9 月二手均价居强二线中游，但由于缺少官方指数与历年均价序列，它是本报告中数据基础最薄的一座城市。</p>
+            <p class="district"><b>区级数据：</b>姑苏、苏州工业园区、高新区、吴中、相城的峰值与现价<span class="missing">均未查到</span>。</p>
+          </article>
+
+          <article class="city-card" id="xa">
+            <h3>西安 <span class="tier">新一线</span><span class="rank">2026 年 9 月二手价全国第 33</span></h3>
+            <div class="price-line"><span class="big">11,748</span><span class="unit">元/㎡ · 2026 年 9 月二手均价</span><span class="total">100㎡ 约 <b>117 万元</b></span></div>
+            <table class="facts">
+              <tr><th>指数峰值</th><td>107.0（2022 年 4 月）<span class="cal">统计局 70 城二手定基（2020 年＝100），2020 年至峰值涨幅约 7%</span></td></tr>
+              <tr><th>高点回调</th><td><span class="missing">未查到</span>精确到城的公开回调百分比</td></tr>
+            </table>
+            <p class="comment">西安 2026 年 9 月二手均价 11,748 元/㎡，在 12 城中列第 10，与成都、武汉同属"万元出头"的内陆新一线梯队。</p>
+            <p class="district"><b>区级数据：</b>碑林／莲湖、雁塔、未央、长安、高陵的峰值与现价<span class="missing">均未查到</span>。</p>
+          </article>
+
+          <article class="city-card" id="cq">
+            <h3>重庆 <span class="tier">新一线</span><span class="rank">2026 年 9 月二手价全国第 56</span></h3>
+            <div class="price-line"><span class="big">8,973</span><span class="unit">元/㎡ · 2026 年 9 月二手均价</span><span class="total">100㎡ 约 <b>90 万元</b></span></div>
+            <table class="facts">
+              <tr><th>指数峰值</th><td>105.0（2022 年 8 月）<span class="cal">统计局 70 城二手定基（2020 年＝100）；2022 年 4 月为 104.9，2020 年至峰值涨幅仅约 5%</span></td></tr>
+              <tr><th>新房</th><td>2026 年 9 月成交均价 8,767 元/㎡（CRIC）<span class="cal">与二手价接近，一二手倒挂不明显</span></td></tr>
+              <tr><th>高点回调</th><td><span class="missing">未查到</span>精确到城的公开回调百分比</td></tr>
+            </table>
+            <p class="comment">重庆二手与新房均价均为 12 城最低。作为直辖市，它的房价收入比相对温和，这一轮周期里涨幅也最小——峰值前两年只涨了约 5%。</p>
+            <p class="district"><b>区级数据：</b>渝中、江北、渝北、南岸、沙坪坝、巴南的峰值与现价<span class="missing">均未查到</span>。</p>
+          </article>
+
+          <article class="city-card" id="cs">
+            <h3>长沙 <span class="tier">新一线</span><span class="rank">2026 年 9 月二手价全国第 48</span></h3>
+            <div class="price-line"><span class="big">9,535</span><span class="unit">元/㎡ · 2026 年 9 月二手均价</span><span class="total">100㎡ 约 <b>95 万元</b></span></div>
+            <table class="facts">
+              <tr><th>指数峰值</th><td>105.9（2022 年 8 月）<span class="cal">统计局 70 城二手定基（2020 年＝100）；2022 年 4 月为 105.6，2020 年至峰值涨幅约 5.9%，12 城最低之一</span></td></tr>
+              <tr><th>高点回调</th><td><span class="missing">未查到</span>精确到城的公开回调百分比</td></tr>
+            </table>
+            <p class="comment">长沙以"房价洼地"著称，调控长期从严，这一轮周期涨幅在 12 城中垫底梯队。2026 年 9 月二手均价 9,535 元/㎡，显著低于其他强二线城市。</p>
+            <p class="district"><b>区级数据：</b>芙蓉／天心、岳麓、雨花、望城、长沙县的峰值与现价<span class="missing">均未查到</span>。</p>
+          </article>
+
+        </div>
+      </section>
+
+      <section id="rhythm">
+        <div class="sec-head">
+          <span class="no">05</span>
+          <h2>15 年的节奏与读法</h2>
+          <p>把指数、现价与回调放在一起，能确认的结论只有几条——但每条都有数据支撑。</p>
+        </div>
+        <div class="card">
+          <p class="note" style="margin-top:0"><b>见顶并不同步。</b>深圳 2021 年 5 月最先见顶（二手房参考价政策出台后），杭州、成都、南京、西安在 2022 年 4 月前后，京沪穗与重庆、长沙迟至 2022 年 8 月。武汉 2022 年 4 月指数已跌回 100.4，实际高点应在 2021 年内。谁先涨、谁先跌，与调控松紧的时点高度相关。</p>
+          <p class="note"><b>涨得最猛的，跌得也最深。</b>2020 年至峰值，北京指数涨 16.0%、上海 13.6%、广州 12.7%，居 12 城前三；此后一线回调 25%–40%。反观南京（+3.9%）、重庆（+5.0%）、长沙（+5.9%），峰值前涨幅有限，本轮的波动量级也小得多。</p>
+          <p class="note"><b>2026 年 9 月出现分化企稳。</b>一线二手环比集体转正（+0.2%），上海同比 +0.8% 为四城唯一正增长，深圳 9 月上半月成交均价环比 +4%；但百城二手同比仍 -6.94%，二线城市的同比、环比口径未见逐城公开数据。</p>
+          <p class="note"><b>租金回报普遍低于 2%。</b>有租金分档可查的 5 城中，按中指 2026 年 9 月租金与禧泰房价估算的毛租金回报率：北京约 1.8%、杭州约 1.7%、上海约 1.6%、广州约 1.5%、深圳约 1.4%。房价越高的城市，租金回报反而越低。</p>
+          <p class="note" style="margin-bottom:0"><b>口径即结论。</b>同一个深圳 2026 年 9 月二手价，禧泰报 69,196、安居客挂牌报 51,703、半月成交报 60,100 元/㎡——相差三成以上。任何引用单一数字谈"房价"的说法，都应先问一句：哪家机构、挂牌还是成交。</p>
+        </div>
+      </section>
+
+      <section id="gaps">
+        <div class="sec-head">
+          <span class="no">06</span>
+          <h2>数据缺口清单</h2>
+          <p>以下内容经检索未获得可引用的公开来源，本报告不作估算填充；列明缺口本身就是调研结论的一部分。</p>
+        </div>
+        <div class="card">
+          <ul class="gaps">
+            <li><b>2011 年均价：</b>除北京（新房 13,173、二手约 22,018 元/㎡）外，其余 11 城 2011 年新房、二手均价均未查到。因此"15 年累计涨幅"只有北京一城可计算。</li>
+            <li><b>2013／2015／2017／2019 年均价：</b>12 城全部年份均未查到元/㎡口径的可靠来源。涨跌节奏可用统计局定基指数描述（定基基准历经三轮切换：2010 年＝100 → 2015 年＝100 → 2020 年＝100），但无法折算为元/㎡价格。</li>
+            <li><b>2021 年峰值二手均价（元/㎡）：</b>仅上海有可靠值（RVMS 63,978 元/㎡）；其余 11 城只有统计局指数峰值，无元/㎡峰值。</li>
+            <li><b>2023／2025 年均价：</b>仅有零星数据（广州新房 2023／2024 年年均、上海新房 2025 年 12 月累计平均、深圳 2023 年各区过户价），不成序列。</li>
+            <li><b>区级峰值与现价：</b>12 城 × 4–6 个区的 2021 年峰值与 2026 年 10 月二手均价基本全部未查到。唯一例外是深圳 2023 年各区过户成交均价，但缺峰值与现价两端，仍算不出区级回调。</li>
+            <li><b>二线城市回调幅度：</b>杭州、南京、成都、武汉、苏州、西安、重庆、长沙未查到精确到城的公开回调百分比；统计局未公开 2026 年 9 月定基（2020 年＝100）全表，无法用指数法自行计算。</li>
+            <li><b>苏州指数缺失：</b>苏州不在 70 城指数覆盖范围内，无官方涨跌节奏校准依据。</li>
+            <li><b>武汉 2021 年指数：</b>2022 年 4 月已回落至 100.4，峰值应在 2021 年内，但 2021 年各月定基未查到。</li>
+            <li><b>分城市租金回报率：</b>无官方发布；本报告 5 城的回报率均为估算值（中指租金分档 ÷ 禧泰房价），其余 7 城租金分档未覆盖，无法估算。</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="sources">
+        <div class="sec-head">
+          <span class="no">07</span>
+          <h2>数据来源</h2>
+          <p>全部数值均可回溯至以下公开来源；机构／媒体综合口径已在正文逐处标注。</p>
+        </div>
+        <ol class="sources">
+          <li>中国房价行情（禧泰数据）全国城市房价排行：<a href="https://www.creprice.cn/rankprice/sale/11.html">https://www.creprice.cn/rankprice/sale/11.html</a>（2026-10-19 读取）</li>
+          <li>国家统计局 2021 年 12 月 70 城房价：<a href="http://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202201/t20220115_1826376.html">http://www.stats.gov.cn/xxgk/sjfb/zxfb2020/202201/t20220115_1826376.html</a></li>
+          <li>国家统计局 2026 年 9 月 70 城解读（21 经济网转载）：<a href="https://www.21jingji.com/article/20261019/herald/b3abf203b9de82c49c7993a0fa55c5b6.html">https://www.21jingji.com/article/20261019/herald/b3abf203b9de82c49c7993a0fa55c5b6.html</a></li>
+          <li>2022 年 4 月 70 城二手定基（聚汇数据）：<a href="https://fangjia.gotohui.com/topic-561">https://fangjia.gotohui.com/topic-561</a></li>
+          <li>国家统计局 2022 年 8 月 70 城发布（英文版）：<a href="https://www.stats.gov.cn/english/PressRelease/202209/t20220916_1888307.html">https://www.stats.gov.cn/english/PressRelease/202209/t20220916_1888307.html</a></li>
+          <li>2021 年 5 月 70 城数据（中金在线转载统计局）：<a href="http://news.cnfol.com/guoneicaijing/20210617/28940422.shtml">http://news.cnfol.com/guoneicaijing/20210617/28940422.shtml</a></li>
+          <li>《存量市场：2021 上海住宅交易市场》（RVMS）：<a href="https://pdf.dfcfw.com/pdf/H3_AP202201261542686140_1.pdf">https://pdf.dfcfw.com/pdf/H3_AP202201261542686140_1.pdf</a></li>
+          <li>CEIC 上海商品房销售价格：<a href="https://www.ceicdata.com/zh-hans/china/nbs-property-price-residential-monthly/property-price-ytd-avg-residential-shanghai">https://www.ceicdata.com/zh-hans/china/nbs-property-price-residential-monthly/property-price-ytd-avg-residential-shanghai</a></li>
+          <li>CEIC 广州商品房销售价格：<a href="https://www.ceicdata.com/zh-hans/china/property-price-prefecture-level-city/cn-property-price-guangdong-guangzhou">https://www.ceicdata.com/zh-hans/china/property-price-prefecture-level-city/cn-property-price-guangdong-guangzhou</a></li>
+          <li>深圳 2021 年高位个案（每日经济新闻／深圳贝壳研究院）：<a href="https://www.nbqzx.com/articles/daily-b9e2b9ba168b.html">https://www.nbqzx.com/articles/daily-b9e2b9ba168b.html</a></li>
+          <li>深圳 2023 年各区二手过户均价（市房地产信息系统，经评估报告转载）：<a href="http://www.cngzy.com/upload/202404/19/202404191620475424.pdf">http://www.cngzy.com/upload/202404/19/202404191620475424.pdf</a></li>
+          <li>中指研究院 2026 年 9 月租赁市场（金融界转载）：<a href="https://m.jrj.com.cn/madapter/finance/2026/10/09165758648760.shtml">https://m.jrj.com.cn/madapter/finance/2026/10/09165758648760.shtml</a>；东方财富转载：<a href="https://finance.eastmoney.com/a/202610163898261138.html">https://finance.eastmoney.com/a/202610163898261138.html</a></li>
+          <li>CRIC 2026 年 9 月重点 15 城新房成交均价（经新浪转载，2026 年 10 月中旬）：上海 73,968、深圳 60,750、北京 57,554、重庆 8,767 元/㎡。</li>
+          <li>中指研究院 2026 年 9 月百城价格指数（2026-10-01 发布）：新房 17,285 元/㎡（环比 +0.17%、同比 +2.12%），二手 12,452 元/㎡（环比 -0.6%、同比 -6.94%）。</li>
+          <li>一线四城回调综述（2026-10-18，综合贝壳研究院等机构口径）：深圳接近 -40%、上海 -30% 以上、北京约 -30%、广州约 -25%～-30%；贝壳重点 30 城平均回落近四成。</li>
+          <li>深圳 2026 年 9 月挂牌／成交（安居客口径，2026-09-19）：挂牌 51,703、新房公示 55,490、上半月成交 60,100 元/㎡。</li>
+          <li>北京 2011 年数据：新房成交均价 13,173 元/㎡（北京市房地产协会）；二手 2011 年 11 月约 22,018 元/㎡（北京市住建委）。</li>
+        </ol>
+      </section>
+
+      <footer>
+        <p>本报告基于 2026 年 10 月 19–20 日的公开来源检索（索引口径）整理。不同机构的统计口径（网签／挂牌／成交／估值）不可直接互比，正文已逐处标注；标注"未查到"的数据点为本次检索未获得可引用来源，不代表该数据不存在。房价数据仅供研究参考，不构成购房或投资建议。</p>
+      </footer>
+    </div>
+
+    <script>
+      (function () {
+        var fmt = function (n) { return n.toLocaleString("zh-CN"); };
+
+        /* ---------- Chart 1: 2026-09 second-hand price bars ---------- */
+        var prices = [
+          { city: "深圳", v: 69196, rank: 1, t: 1 }, { city: "上海", v: 61616, rank: 2, t: 1 },
+          { city: "北京", v: 54395, rank: 3, t: 1 }, { city: "广州", v: 37664, rank: 4, t: 1 },
+          { city: "杭州", v: 33222, rank: 5, t: 2 }, { city: "南京", v: 23661, rank: 8, t: 2 },
+          { city: "苏州", v: 17030, rank: 14, t: 2 }, { city: "成都", v: 14156, rank: 20, t: 2 },
+          { city: "武汉", v: 12037, rank: 31, t: 2 }, { city: "西安", v: 11748, rank: 33, t: 2 },
+          { city: "长沙", v: 9535, rank: 48, t: 2 }, { city: "重庆", v: 8973, rank: 56, t: 2 }
+        ];
+        var max = 69196;
+        var host = document.getElementById("priceChart");
+        prices.forEach(function (d) {
+          var row = document.createElement("div");
+          row.className = "bar-row" + (d.t === 2 ? " t2" : "");
+          var total = Math.round(d.v * 100 / 10000);
+          row.innerHTML =
+            '<div class="city">' + d.city + "</div>" +
+            '<div class="track"><div class="fill" style="width:' + (d.v / max * 100).toFixed(1) + '%"></div></div>' +
+            '<div class="val">' + fmt(d.v) + " 元/㎡<small>全国第 " + d.rank + " · 100㎡约 " + total + " 万</small></div>";
+          host.appendChild(row);
+        });
+
+        /* ---------- Chart 2: NBS fixed-base index lines ---------- */
+        // months: x positions — 2020 avg, 2021-05, 2021-12, 2022-04, 2022-08
+        var months = ["2020 年\n（基期）", "2021 年 5 月", "2021 年 12 月", "2022 年 4 月", "2022 年 8 月"];
+        var series = [
+          { city: "北京", pts: [100, null, 111.6, 115, 116.0], peak: 4, color: "#b3352b" },
+          { city: "上海", pts: [100, null, null, 111.9, 113.6], peak: 4, color: "#c96a1e" },
+          { city: "广州", pts: [100, 110.2, null, 111.9, 112.7], peak: 4, color: "#a97b1e" },
+          { city: "深圳", pts: [100, 109.4, null, 106, 104.0], peak: 1, color: "#22705a" },
+          { city: "杭州", pts: [100, null, null, 109.5, 109.2], peak: 3, color: "#3d7ea6" },
+          { city: "成都", pts: [100, null, null, 109.6, null], peak: 3, color: "#5b7f3c" },
+          { city: "南京", pts: [100, null, null, 103.9, 103.4], peak: 3, color: "#7a6a9e" },
+          { city: "武汉", pts: [100, null, null, 100.4, 98.5], peak: null, color: "#8a5a7a" },
+          { city: "西安", pts: [100, null, null, 107.0, null], peak: 3, color: "#4a7a7a" },
+          { city: "重庆", pts: [100, null, null, 104.9, 105.0], peak: 4, color: "#96604a" },
+          { city: "长沙", pts: [100, null, null, 105.6, 105.9], peak: 4, color: "#5a6e96" }
+        ];
+        var dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        var gridC = dark ? "#3d362a" : "#ddd3c2";
+        var txtC = dark ? "#b3a892" : "#6d6355";
+        var W = 720, H = 340, L = 44, R = 64, T = 18, B = 40;
+        var yMin = 96, yMax = 120;
+        function X(i) { return L + (W - L - R) * i / 4; }
+        function Y(v) { return T + (H - T - B) * (yMax - v) / (yMax - yMin); }
+
+        var active = { "北京": true, "上海": true, "广州": true, "深圳": true };
+        var tog = document.getElementById("idxToggles");
+        series.forEach(function (s) {
+          var b = document.createElement("button");
+          b.type = "button";
+          b.textContent = s.city;
+          b.setAttribute("aria-pressed", active[s.city] ? "true" : "false");
+          b.addEventListener("click", function () {
+            active[s.city] = !active[s.city];
+            b.setAttribute("aria-pressed", active[s.city] ? "true" : "false");
+            draw();
+          });
+          tog.appendChild(b);
+        });
+
+        function draw() {
+          var svg = ['<svg viewBox="0 0 ' + W + " " + H + '" xmlns="http://www.w3.org/2000/svg" font-family="Noto Sans SC, sans-serif">'];
+          [96, 100, 105, 110, 115, 120].forEach(function (v) {
+            svg.push('<line x1="' + L + '" y1="' + Y(v) + '" x2="' + (W - R) + '" y2="' + Y(v) + '" stroke="' + gridC + '" stroke-width="1"/>');
+            svg.push('<text x="' + (L - 8) + '" y="' + (Y(v) + 4) + '" font-size="11" fill="' + txtC + '" text-anchor="end">' + v + "</text>");
+          });
+          svg.push('<line x1="' + L + '" y1="' + Y(100) + '" x2="' + (W - R) + '" y2="' + Y(100) + '" stroke="' + txtC + '" stroke-width="1.2" stroke-dasharray="4 3"/>');
+          months.forEach(function (m, i) {
+            var lines = m.split("\n");
+            lines.forEach(function (ln, j) {
+              svg.push('<text x="' + X(i) + '" y="' + (H - 22 + j * 13) + '" font-size="11" fill="' + txtC + '" text-anchor="middle">' + ln + "</text>");
+            });
+          });
+          series.forEach(function (s) {
+            if (!active[s.city]) return;
+            var path = "", started = false;
+            s.pts.forEach(function (v, i) {
+              if (v === null) return;
+              path += (started ? " L" : "M") + X(i).toFixed(1) + " " + Y(v).toFixed(1);
+              started = true;
+            });
+            svg.push('<path d="' + path + '" fill="none" stroke="' + s.color + '" stroke-width="2.2"/>');
+            s.pts.forEach(function (v, i) {
+              if (v === null) return;
+              var isPeak = (s.peak === i);
+              svg.push('<circle cx="' + X(i) + '" cy="' + Y(v) + '" r="' + (isPeak ? 4.5 : 3) + '" fill="' + s.color + '" stroke="' + (dark ? "#211d16" : "#fffdf9") + '" stroke-width="1.4"/>');
+              if (isPeak) {
+                svg.push('<text x="' + X(i) + '" y="' + (Y(v) - 10) + '" font-size="11.5" font-weight="700" fill="' + s.color + '" text-anchor="middle">' + v.toFixed(1) + "</text>");
+              }
+            });
+            // end label at last known point
+            var lastI = -1;
+            s.pts.forEach(function (v, i) { if (v !== null) lastI = i; });
+            if (lastI >= 0) {
+              svg.push('<text x="' + (X(lastI) + 9) + '" y="' + (Y(s.pts[lastI]) + 4) + '" font-size="12" font-weight="700" fill="' + s.color + '">' + s.city + "</text>");
+            }
+          });
+          svg.push("</svg>");
+          document.getElementById("idxChart").innerHTML = svg.join("");
+        }
+        draw();
+      })();
+    </script>
+  </body>
+</html>
